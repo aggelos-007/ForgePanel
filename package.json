@@ -1,0 +1,42 @@
+{
+  "name": "@tryforge/forge.panel",
+  "version": "0.0.1",
+  "description": "A panel that helps you manage your bot with ease through a web UI",
+  "keywords": [
+    "panel",
+    "forgescript",
+    "fs",
+    "forgepanel"
+  ],
+  "homepage": "https://github.com/tryforge/ForgePanel#readme",
+  "bugs": {
+    "url": "https://github.com/tryforge/ForgePanel/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tryforge/ForgePanel.git"
+  },
+  "license": "GPL-3.0",
+  "author": "aggelos007",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "tsc && node ."
+  },
+  "devDependencies": {
+    "@tryforge/forge.canvas": "^1.2.3",
+    "@tryforge/forge.db": "^2.0.9",
+    "@tryforge/forgescript": "^2.3.0",
+    "@types/node": "^22.15.18",
+    "@types/pidusage": "^2.0.5",
+    "@types/ws": "^8.18.1",
+    "discord.js": "^14.21.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.15.0",
+    "hono": "^4.8.4",
+    "pidusage": "^4.0.1",
+    "ws": "^8.18.3"
+  }
+}

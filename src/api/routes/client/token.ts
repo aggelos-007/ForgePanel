@@ -15,7 +15,6 @@ export const data = createRoute({
         })
         if(check.status !== 200) return reply.msg(400, "Invalid token provided.");
         await Panel.updateConfig({ bot: { token } })
-
         if(InstanceManager.child) InstanceManager.restart();
         return reply.succ()
     }

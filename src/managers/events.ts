@@ -1,5 +1,7 @@
 import { GuildFeature } from "discord.js";
 import EventEmitter from "events";
+import { DeepPartial } from "./panel";
+import { ConfigSchema } from "../config";
 
 export enum OpCodes {
     Identify = 0,
@@ -8,7 +10,7 @@ export enum OpCodes {
     Usage = 3,
     GuildJoin = 4,
     GuildLeave = 5,
-    TokeChange = 6,
+    ConfigUpdate = 6,
 };
 
 export enum PowerAction {
@@ -37,7 +39,7 @@ type EventsData = {
     [OpCodes.GuildLeave]: {
         id: string;
     };
-    [OpCodes.TokeChange]: never;
+    [OpCodes.ConfigUpdate]: DeepPartial<ConfigSchema["bot"]>;
 };
 
 interface DataObject<T extends OpCodes> {

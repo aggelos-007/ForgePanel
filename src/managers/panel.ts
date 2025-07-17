@@ -1,5 +1,5 @@
 import { dirname, join } from "path";
-import { InstanceManager } from ".";
+import { emitter, InstanceManager, OpCodes } from ".";
 import { botFile, config, ConfigDefaultSchema, ConfigSchema } from "../config";
 import { mkdirSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
@@ -36,6 +36,15 @@ export class Panel {
 
     public static async updateConfig(data: DeepPartial<ConfigSchema>){
         if(!this.config) return;
+
+        if(data.bot){
+            const { ["token"]: _, ...rest } = data.bot;
+            emitter.emit("websocket", {
+                op: OpCodes.ConfigUpdate,
+                data: rest
+            });
+        };
+
         const config = this.#updateConfig(data, this.config);
         await this.#writeConfigFile(config);
         return this.config = config;

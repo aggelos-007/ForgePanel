@@ -23,6 +23,7 @@ var ProcessCodes;
     ProcessCodes["StatusDelete"] = "StatusDelete";
     ProcessCodes["Appearence"] = "Appearence";
     ProcessCodes["ChangeAppearence"] = "ChangeAppearence";
+    ProcessCodes["UpdateCommands"] = "UpdateCommands";
 })(ProcessCodes || (exports.ProcessCodes = ProcessCodes = {}));
 ;
 ;
@@ -42,7 +43,7 @@ class ForgePanel extends forgescript_1.ForgeExtension {
     async init(client) {
         this.#client = client;
         process.on("message", this.#parentManager.bind(this));
-        client.once("ready", c => {
+        client.once("ready", (c) => {
             this.#client = c;
             this.Compiler = ForgePanel.Compiler;
             this.#parentManager({
@@ -130,6 +131,19 @@ class ForgePanel extends forgescript_1.ForgeExtension {
                         if (this.#statusInterval)
                             clearInterval(this.#statusInterval);
                         this.#client?.user.setPresence({ status: "online", activities: [] });
+                        break;
+                    case ProcessCodes.UpdateCommands:
+                        try {
+                            this.#client?.commandManagers.forEach(s => s.refresh());
+                        }
+                        catch (e) { }
+                        ;
+                        try {
+                            this.#client?.applicationCommands.load();
+                            this.#client?.applicationCommands.registerGlobal();
+                        }
+                        catch (e) { }
+                        ;
                         break;
                 }
                 break;

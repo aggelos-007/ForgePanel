@@ -11,6 +11,7 @@ export enum OpCodes {
     GuildJoin = 4,
     GuildLeave = 5,
     ConfigUpdate = 6,
+    UpdateCommands = 7,
 };
 
 export enum PowerAction {
@@ -40,6 +41,7 @@ type EventsData = {
         id: string;
     };
     [OpCodes.ConfigUpdate]: DeepPartial<ConfigSchema["bot"]>;
+    [OpCodes.UpdateCommands]: never;
 };
 
 interface DataObject<T extends OpCodes> {

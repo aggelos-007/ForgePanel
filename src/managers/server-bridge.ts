@@ -19,7 +19,8 @@ export enum ProcessCodes {
     StatusUpdate = "StatusUpdate",
     StatusDelete = "StatusDelete",
     Appearence = "Appearence",
-    ChangeAppearence = "ChangeAppearence"
+    ChangeAppearence = "ChangeAppearence",
+    UpdateCommands = "UpdateCommands"
 };
 
 export type ProcessMessageData = {
@@ -61,6 +62,7 @@ export type ProcessMessageData = {
         avatar: "error" | string | undefined | null;
         banner: "error" | string | undefined | null;
     }
+    [ProcessCodes.UpdateCommands]: never;
 };
 
 export interface ProcessMessages<Type extends SendType, Code extends ProcessCodes> {
@@ -88,7 +90,7 @@ export class ForgePanel extends ForgeExtension {
         this.#client = client;
         process.on("message", this.#parentManager.bind(this));
 
-        client.once("ready", c => {
+        client.once("ready", (c) => {
             this.#client = c as ForgeClient;
             this.Compiler = ForgePanel.Compiler;
             this.#parentManager({
@@ -169,12 +171,21 @@ export class ForgePanel extends ForgeExtension {
                                 }]
                             })
                         }
-                        setStatus()
-                        this.#statusInterval = setInterval(setStatus, interval)
+                        setStatus();
+                        this.#statusInterval = setInterval(setStatus, interval);
                     break;
                     case ProcessCodes.StatusDelete:
                         if(this.#statusInterval) clearInterval(this.#statusInterval);
                         this.#client?.user.setPresence({status: "online", activities: []})
+                    break;
+                    case ProcessCodes.UpdateCommands:
+                        try {
+                            this.#client?.commandManagers.forEach(s => s.refresh());
+                        } catch(e){};
+                        try {
+                            this.#client?.applicationCommands.load();
+                            this.#client?.applicationCommands.registerGlobal();
+                        } catch(e){};
                     break;
                 }
             break;

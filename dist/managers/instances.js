@@ -34,6 +34,7 @@ class InstanceManager {
         this.child.once("exit", this.#onExit.bind(this));
     }
     static #handleLogs(data) {
+        console.log(String(data).trim());
         this.logStream.write(data);
         events_1.emitter.emit("websocket", {
             op: events_1.OpCodes.Console,

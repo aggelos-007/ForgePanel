@@ -7,6 +7,7 @@ const config_1 = require("../config");
 const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
 const api_1 = require("../api");
+const commands_1 = require("./commands");
 class Panel {
     dir;
     static dir = require.main?.filename;
@@ -22,6 +23,7 @@ class Panel {
         Panel.webserver.listen(port);
         Panel.dir = this.dir = (0, path_1.dirname)(dir);
         new _1.InstanceManager((0, path_1.join)(this.dir, config_1.config.bot));
+        new commands_1.CommandManager(dir);
         this.create().then(async (start) => { if (start)
             _1.InstanceManager.start(); });
     }
@@ -29,6 +31,14 @@ class Panel {
     static async updateConfig(data) {
         if (!this.config)
             return;
+        if (data.bot) {
+            const { ["token"]: _, ...rest } = data.bot;
+            _1.emitter.emit("websocket", {
+                op: _1.OpCodes.ConfigUpdate,
+                data: rest
+            });
+        }
+        ;
         const config = this.#updateConfig(data, this.config);
         await this.#writeConfigFile(config);
         return this.config = config;

@@ -21,6 +21,7 @@ class WebSocket {
                 catch (_) {
                     this.#listeners.delete(id);
                 }
+                ;
             }
             else
                 this.#listeners.delete(id);

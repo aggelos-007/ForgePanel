@@ -13,6 +13,8 @@ var OpCodes;
     OpCodes[OpCodes["Usage"] = 3] = "Usage";
     OpCodes[OpCodes["GuildJoin"] = 4] = "GuildJoin";
     OpCodes[OpCodes["GuildLeave"] = 5] = "GuildLeave";
+    OpCodes[OpCodes["ConfigUpdate"] = 6] = "ConfigUpdate";
+    OpCodes[OpCodes["UpdateCommands"] = 7] = "UpdateCommands";
 })(OpCodes || (exports.OpCodes = OpCodes = {}));
 ;
 var PowerAction;

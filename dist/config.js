@@ -7,7 +7,8 @@ exports.config = {
     config: "config.json",
     bot: "discord.js",
     commands: {
-        events: "commands/events"
+        base: "commands/base",
+        slashes: "commands/application"
     }
 };
 exports.ConfigDefaultSchema = {
@@ -38,6 +39,7 @@ exports.botFile = `
 const { ExtensionsManager, ForgePanel } = require("@tryforge/forge.panel");
 const { Compiler, ForgeClient } = require("@tryforge/forgescript");
 const config = require("./.panel/config.json");
+const { existsSync } = require("fs");
 
 const client = new ForgeClient({
     ...config.bot.client,
@@ -46,10 +48,9 @@ const client = new ForgeClient({
 
 ForgePanel.Compiler = Compiler;
 
-try {
-    client.commands.load('./commands/events');
-    client.applicationCommands.load('./commands/application');
-} catch(_){};
+if(existsSync('./commands/base')) client.commands.load('./commands/base');
+if(existsSync('./commands/application')) client.applicationCommands.load('./commands/application');
+
 
 client.login(config.bot.token);
 `.trim();

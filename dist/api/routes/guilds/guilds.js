@@ -20,7 +20,6 @@ exports.data = (0, apiserver_1.createRoute)({
                     return reply.msg(500, "Server failed to respond");
                 else
                     return reply.msg(500, "Server is offline");
-                break;
             case "get":
                 const info = await managers_1.InstanceManager.askChild({ code: managers_1.ProcessCodes.GuildInfo, data: c.req.param("id") });
                 if (info) {
@@ -33,7 +32,6 @@ exports.data = (0, apiserver_1.createRoute)({
                     return reply.msg(500, "Server failed to respond");
                 else
                     return reply.msg(500, "Server is offline");
-                break;
         }
         ;
     }

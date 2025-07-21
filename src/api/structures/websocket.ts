@@ -11,15 +11,15 @@ export class WebSocket {
     };
 
     #message(data: TypedEventData){
-        const json = JSON.stringify(data)
+        const json = JSON.stringify(data);
         for(const [id, ws] of this.#listeners){
             if(ws.readyState == WS.OPEN){
                 try {
                     ws.send(json);
                 } catch(_){
-                    this.#listeners.delete(id)
-                }
-            } else this.#listeners.delete(id)
+                    this.#listeners.delete(id);
+                };
+            } else this.#listeners.delete(id);
         };
     };
 

@@ -4,6 +4,7 @@ import { botFile, config, ConfigDefaultSchema, ConfigSchema } from "../config";
 import { mkdirSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
 import { WebServer } from "../api";
+import { CommandManager } from "./commands";
 
 export type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends object
@@ -30,6 +31,7 @@ export class Panel {
 
         Panel.dir = this.dir = dirname(dir);
         new InstanceManager(join(this.dir, config.bot));
+        new CommandManager(dir)
 
         this.create().then(async start => { if(start) InstanceManager.start(); });
     };

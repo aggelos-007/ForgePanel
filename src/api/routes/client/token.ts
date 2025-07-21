@@ -1,4 +1,4 @@
-import { emitter, InstanceManager, OpCodes, Panel } from "../../../managers";
+import { InstanceManager, Panel } from "../../../managers";
 import { createRoute } from "../../structures/apiserver";
 
 export const data = createRoute({

@@ -5,7 +5,7 @@ import { lstatSync, readdirSync, watch } from 'fs';
 import { createServer, IncomingMessage } from 'http';
 import { ContentfulStatusCode } from 'hono/utils/http-status';
 
-const isValidFile = (file: string) => file.endsWith('.js')
+const isValidFile = (file: string) => file.endsWith('.js');
 type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export interface RouteOptions<P extends string> {
@@ -103,6 +103,6 @@ export class APIServer {
     }
 
     listen(port: number) {
-        return this.server.listen(port);
+        return this.server.listen(port)
     };
 };

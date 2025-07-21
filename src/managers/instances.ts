@@ -5,7 +5,7 @@ import { config } from "../config";
 import { randomUUID } from "crypto";
 import { createWriteStream } from "fs";
 import { ChildProcess, fork } from "child_process";
-import { emitter, OpCodes, PowerAction } from "./events";
+import { emitter, OpCodes } from "./events";
 import { ProcessCodes, ProcessMessage, ProcessMessages, SendType } from "./server-bridge";
 
 export class InstanceManager {
@@ -33,6 +33,7 @@ export class InstanceManager {
     }
 
     static #handleLogs(data: any){
+        console.log(String(data).trim())
         this.logStream.write(data);
         emitter.emit("websocket", {
             op: OpCodes.Console,

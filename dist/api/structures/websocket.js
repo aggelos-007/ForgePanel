@@ -12,6 +12,8 @@ class WebSocket {
     }
     ;
     #message(data) {
+        if (data.op == 3)
+            return;
         const json = JSON.stringify(data);
         for (const [id, ws] of this.#listeners) {
             if (ws.readyState == ws_1.WebSocket.OPEN) {

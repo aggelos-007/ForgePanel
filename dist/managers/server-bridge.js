@@ -4,7 +4,6 @@ exports.ForgePanel = exports.ProcessCodes = exports.SendType = void 0;
 const forgescript_1 = require("@tryforge/forgescript");
 const crypto_1 = require("crypto");
 const events_1 = require("./events");
-const discord_js_1 = require("discord.js");
 var SendType;
 (function (SendType) {
     SendType[SendType["Information"] = 0] = "Information";
@@ -145,6 +144,9 @@ class ForgePanel extends forgescript_1.ForgeExtension {
                         catch (e) { }
                         ;
                         break;
+                    case ProcessCodes.ChangeAppearence:
+                        this.#client?.user.fetch();
+                        break;
                 }
                 break;
             case SendType.RequestReply:
@@ -185,7 +187,10 @@ class ForgePanel extends forgescript_1.ForgeExtension {
                         data.data = this.#client ? {
                             uptime: this.#client.uptime,
                             guilds: this.#client.guilds.cache.size,
-                            users: users && users > 0 ? users : null
+                            users: users && users > 0 ? users : null,
+                            commands: this.#client.commands.count,
+                            //@ts-ignore
+                            applicationCommands: this.#client.applicationCommands.commands.size
                         } : null;
                         break;
                     case ProcessCodes.Appearence:
@@ -194,14 +199,6 @@ class ForgePanel extends forgescript_1.ForgeExtension {
                             banner: this.#client.user.bannerURL({ extension: "png", size: 4096 }) ?? null,
                             avatar: this.#client.user.displayAvatarURL({ extension: "png", size: 4096 })
                         } : null;
-                        break;
-                    case ProcessCodes.ChangeAppearence:
-                        const [avatar, banner, username] = await Promise.all([
-                            msg.data?.avatar !== undefined ? this.#client?.user?.setAvatar(msg.data?.avatar || null).catch(() => "error") : undefined,
-                            msg.data?.banner !== undefined ? this.#client?.user?.setBanner(msg.data.banner).catch(() => "error") : undefined,
-                            msg.data?.username && msg.data.username != this.#client?.user.username ? this.#client?.user?.setUsername(msg.data.username).catch(() => "error") : undefined
-                        ]);
-                        data.data = { avatar: avatar instanceof discord_js_1.ClientUser ? avatar.displayAvatarURL() : avatar, banner: banner instanceof discord_js_1.ClientUser ? banner.bannerURL() : banner, username: username instanceof discord_js_1.ClientUser ? username.username : username };
                         break;
                 }
                 ;

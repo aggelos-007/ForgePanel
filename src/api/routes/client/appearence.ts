@@ -13,7 +13,7 @@ export const data = createRoute({
     async handler(c, reply){
         switch(c.req.method.toLowerCase()){
             case "patch":
-                const json = await c.req.json()
+                const json = await c.req.json() as IBody;
             case "get":
                 const res = await InstanceManager.askChild({ code: ProcessCodes.Appearence })
                 if(res) return reply.succ(res.data);

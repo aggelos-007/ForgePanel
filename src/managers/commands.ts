@@ -4,6 +4,7 @@ import { basename, dirname, join } from "path";
 import { existsSync, mkdirSync, readdirSync, renameSync, statSync, unlinkSync, writeFileSync } from "fs";
 import { InstanceManager } from "./instances";
 import { ProcessCodes } from "./server-bridge";
+import { emitter, OpCodes } from "./events";
 
 export class CommandManager {
     static commandsPath: (string | undefined)[] = [];
@@ -70,6 +71,7 @@ export class CommandManager {
             this[`${type}Map`].delete(path);
             this.commandsPath[id] = undefined;
             InstanceManager.sendMessage({ code: ProcessCodes.UpdateCommands })
+            emitter.emit("websocket", { op: OpCodes.DeleteCommand, data: { id, type } })
             return true
         } catch(_) {
             return false
@@ -93,6 +95,7 @@ export class CommandManager {
             arr[id] = path;
             delete require.cache[require.resolve(path)];
             InstanceManager.sendMessage({ code: ProcessCodes.UpdateCommands })
+            emitter.emit("websocket", { op: OpCodes.CreateCommand, data: { id, type, commandData } })
             return id;
         } catch (e) {
             return null;
@@ -108,6 +111,7 @@ export class CommandManager {
             const content = typeof commandData === 'string' ? commandData : `module.exports = ${JSON.stringify(commandData, null, 2)};`;
             writeFileSync(path, content, { encoding: 'utf-8' });
             const data = require(path);
+            emitter.emit("websocket", { op: OpCodes.EditCommand, data: { id, type, newCommandData: data.default ?? data, oldCommandData: this[`${type}Map`].get(path) as any } })
             this[`${type}Map`].set(path, data.default ?? data);
             delete require.cache[require.resolve(path)];
             InstanceManager.sendMessage({ code: ProcessCodes.UpdateCommands })
@@ -127,6 +131,7 @@ export class CommandManager {
             map.set(path + ".disabled", map.get(path) as any);
             map.delete(path);
             InstanceManager.sendMessage({ code: ProcessCodes.UpdateCommands })
+            emitter.emit("websocket", { op: OpCodes.DisableCommand, data: { id, type } })
             renameSync(path, path + ".disabled");
             return true;
         } catch (e) {
@@ -144,7 +149,31 @@ export class CommandManager {
             map.set(path.replace(".disabled", ""), map.get(path) as any);
             map.delete(path);
             InstanceManager.sendMessage({ code: ProcessCodes.UpdateCommands })
+            emitter.emit("websocket", { op: OpCodes.EnableCommand, data: { id, type } })
             renameSync(path, path.replace(".disabled", ""));
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    static moveCommand(data: { id: number; path: string; type: "commands" | "slashes" }){
+        const { id, type } = data;
+        const arr = this[`${type}Path`];
+        const path = arr[id];
+        if(!path) return null;
+        try {
+            const name = basename(path);
+            const newPath = join(this.dir, config.commands[type == "commands" ? "base" : "slashes"], data.path, name);
+            const check = dirname(newPath)
+            if(!existsSync(check)) mkdirSync(check, { recursive: true });
+            renameSync(path, newPath);
+            this[`${type}Map`].set(newPath, this[`${type}Map`].get(path) as any);
+            this[`${type}Map`].delete(path);
+            arr[id] = newPath;
+            emitter.emit("websocket", { op: OpCodes.MoveCommand, data: { id, type,
+                oldPath: dirname(path).replace(join(this.dir, config.commands[type == "commands" ? "base" : "slashes"]), ""),
+                newPath: dirname(newPath).replace(join(this.dir, config.commands[type == "commands" ? "base" : "slashes"]), "") } })
             return true;
         } catch (e) {
             return false;

@@ -7,6 +7,7 @@ const path_1 = require("path");
 const fs_1 = require("fs");
 const instances_1 = require("./instances");
 const server_bridge_1 = require("./server-bridge");
+const events_1 = require("./events");
 class CommandManager {
     static commandsPath = [];
     static commandsMap = new Map();
@@ -75,6 +76,7 @@ class CommandManager {
             this[`${type}Map`].delete(path);
             this.commandsPath[id] = undefined;
             instances_1.InstanceManager.sendMessage({ code: server_bridge_1.ProcessCodes.UpdateCommands });
+            events_1.emitter.emit("websocket", { op: events_1.OpCodes.DeleteCommand, data: { id, type } });
             return true;
         }
         catch (_) {
@@ -101,6 +103,7 @@ class CommandManager {
             arr[id] = path;
             delete require.cache[require.resolve(path)];
             instances_1.InstanceManager.sendMessage({ code: server_bridge_1.ProcessCodes.UpdateCommands });
+            events_1.emitter.emit("websocket", { op: events_1.OpCodes.CreateCommand, data: { id, type, commandData } });
             return id;
         }
         catch (e) {
@@ -118,6 +121,7 @@ class CommandManager {
             const content = typeof commandData === 'string' ? commandData : `module.exports = ${JSON.stringify(commandData, null, 2)};`;
             (0, fs_1.writeFileSync)(path, content, { encoding: 'utf-8' });
             const data = require(path);
+            events_1.emitter.emit("websocket", { op: events_1.OpCodes.EditCommand, data: { id, type, newCommandData: data.default ?? data, oldCommandData: this[`${type}Map`].get(path) } });
             this[`${type}Map`].set(path, data.default ?? data);
             delete require.cache[require.resolve(path)];
             instances_1.InstanceManager.sendMessage({ code: server_bridge_1.ProcessCodes.UpdateCommands });
@@ -139,6 +143,7 @@ class CommandManager {
             map.set(path + ".disabled", map.get(path));
             map.delete(path);
             instances_1.InstanceManager.sendMessage({ code: server_bridge_1.ProcessCodes.UpdateCommands });
+            events_1.emitter.emit("websocket", { op: events_1.OpCodes.DisableCommand, data: { id, type } });
             (0, fs_1.renameSync)(path, path + ".disabled");
             return true;
         }
@@ -158,7 +163,33 @@ class CommandManager {
             map.set(path.replace(".disabled", ""), map.get(path));
             map.delete(path);
             instances_1.InstanceManager.sendMessage({ code: server_bridge_1.ProcessCodes.UpdateCommands });
+            events_1.emitter.emit("websocket", { op: events_1.OpCodes.EnableCommand, data: { id, type } });
             (0, fs_1.renameSync)(path, path.replace(".disabled", ""));
+            return true;
+        }
+        catch (e) {
+            return false;
+        }
+    }
+    static moveCommand(data) {
+        const { id, type } = data;
+        const arr = this[`${type}Path`];
+        const path = arr[id];
+        if (!path)
+            return null;
+        try {
+            const name = (0, path_1.basename)(path);
+            const newPath = (0, path_1.join)(this.dir, config_1.config.commands[type == "commands" ? "base" : "slashes"], data.path, name);
+            const check = (0, path_1.dirname)(newPath);
+            if (!(0, fs_1.existsSync)(check))
+                (0, fs_1.mkdirSync)(check, { recursive: true });
+            (0, fs_1.renameSync)(path, newPath);
+            this[`${type}Map`].set(newPath, this[`${type}Map`].get(path));
+            this[`${type}Map`].delete(path);
+            arr[id] = newPath;
+            events_1.emitter.emit("websocket", { op: events_1.OpCodes.MoveCommand, data: { id, type,
+                    oldPath: (0, path_1.dirname)(path).replace((0, path_1.join)(this.dir, config_1.config.commands[type == "commands" ? "base" : "slashes"]), ""),
+                    newPath: (0, path_1.dirname)(newPath).replace((0, path_1.join)(this.dir, config_1.config.commands[type == "commands" ? "base" : "slashes"]), "") } });
             return true;
         }
         catch (e) {

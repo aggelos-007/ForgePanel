@@ -11,6 +11,7 @@ export class WebSocket {
     };
 
     #message(data: TypedEventData){
+        if(data.op == 3) return;
         const json = JSON.stringify(data);
         for(const [id, ws] of this.#listeners){
             if(ws.readyState == WS.OPEN){

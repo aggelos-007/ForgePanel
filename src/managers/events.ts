@@ -2,6 +2,7 @@ import { GuildFeature } from "discord.js";
 import EventEmitter from "events";
 import { DeepPartial } from "./panel";
 import { ConfigSchema } from "../config";
+import { IApplicationCommandData, IBaseCommand } from "@tryforge/forgescript";
 
 export enum OpCodes {
     Identify = 0,
@@ -11,7 +12,12 @@ export enum OpCodes {
     GuildJoin = 4,
     GuildLeave = 5,
     ConfigUpdate = 6,
-    UpdateCommands = 7,
+    CreateCommand = 7,
+    EditCommand = 8,
+    DeleteCommand = 9,
+    DisableCommand = 10,
+    EnableCommand = 11,
+    MoveCommand = 12
 };
 
 export enum PowerAction {
@@ -41,7 +47,35 @@ type EventsData = {
         id: string;
     };
     [OpCodes.ConfigUpdate]: DeepPartial<ConfigSchema["bot"]>;
-    [OpCodes.UpdateCommands]: never;
+    [OpCodes.CreateCommand]: {
+        id: number;
+        type: "commands" | "slashes";
+        commandData: IBaseCommand<string> | IApplicationCommandData;
+    };
+    [OpCodes.EditCommand]: {
+        id: number;
+        type: "commands" | "slashes";
+        oldCommandData: IBaseCommand<string> | IApplicationCommandData;
+        newCommandData: IBaseCommand<string> | IApplicationCommandData;
+    };
+    [OpCodes.DeleteCommand]: {
+        id: number;
+        type: "commands" | "slashes";
+    };
+    [OpCodes.DisableCommand]: {
+        id: number;
+        type: "commands" | "slashes";
+    };
+    [OpCodes.EnableCommand]: {
+        id: number;
+        type: "commands" | "slashes";
+    };
+    [OpCodes.MoveCommand]: {
+        id: number;
+        type: "commands" | "slashes";
+        oldPath: string;
+        newPath: string;
+    };
 };
 
 interface DataObject<T extends OpCodes> {

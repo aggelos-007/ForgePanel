@@ -24,8 +24,6 @@
     "test": "tsc && node ."
   },
   "devDependencies": {
-    "@tryforge/forge.canvas": "^1.2.3",
-    "@tryforge/forge.db": "^2.0.9",
     "@tryforge/forgescript": "^2.3.0",
     "@types/node": "^22.15.18",
     "@types/pidusage": "^2.0.5",
@@ -34,7 +32,6 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@hono/node-server": "^1.15.0",
     "hono": "^4.8.4",
     "pidusage": "^4.0.1",
     "ws": "^8.18.3"

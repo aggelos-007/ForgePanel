@@ -29,7 +29,7 @@ var ProcessCodes;
 const pkg = require('../../package.json');
 class ForgePanel extends forgescript_1.ForgeExtension {
     config;
-    name = "ForgePanel";
+    name = "forge.panel";
     description = pkg.description;
     version = pkg.version;
     static Compiler = forgescript_1.Compiler;

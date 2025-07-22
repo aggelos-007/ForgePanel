@@ -19,5 +19,6 @@ exports.data = (0, apiserver_1.createRoute)({
                 managers_1.InstanceManager.restart();
                 return reply.succ();
         }
+        ;
     }
 });

@@ -15,7 +15,7 @@ export const data = createRoute({
                 if(!json) return reply.msg(400, "Invalid JSON");
                 await Panel.updateConfig({ bot: json })
                 InstanceManager.restart();
-                return reply.succ()
-        }
+                return reply.succ();
+        };
     }
 })

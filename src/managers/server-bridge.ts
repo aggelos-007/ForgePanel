@@ -78,7 +78,7 @@ export type ProcessMessage = { [K in ProcessCodes]: ProcessMessages<SendType, K>
 
 const pkg = require('../../package.json');
 export class ForgePanel extends ForgeExtension {
-    name: string = "ForgePanel";
+    name: string = "forge.panel";
     description: string = pkg.description;
     version: string = pkg.version;
 

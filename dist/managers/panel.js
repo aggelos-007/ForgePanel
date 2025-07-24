@@ -18,10 +18,10 @@ class Panel {
         const dir = Panel.dir;
         if (!dir)
             throw new Error("Could not resolve main directory.");
-        Panel.webserver = new api_1.WebServer();
+        Panel.dir = this.dir = (0, path_1.dirname)(dir);
+        Panel.webserver = new api_1.WebServer((0, path_1.join)(this.dir, config_1.config.dir));
         Panel.reloadRoutes();
         Panel.webserver.listen(port);
-        Panel.dir = this.dir = (0, path_1.dirname)(dir);
         new _1.InstanceManager((0, path_1.join)(this.dir, config_1.config.bot));
         new commands_1.CommandManager(dir);
         this.create().then(async (start) => { if (start)

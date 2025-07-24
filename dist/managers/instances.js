@@ -73,6 +73,12 @@ class InstanceManager {
                 }
             });
         }, 1_000);
+        events_1.emitter.emit("websocket", {
+            op: events_1.OpCodes.Power,
+            data: {
+                action: events_1.PowerAction.Start
+            }
+        });
     }
     static async stop() {
         if (!this.child)
@@ -82,6 +88,12 @@ class InstanceManager {
         const child = this.child;
         this.child = false;
         this.#interval = null;
+        events_1.emitter.emit("websocket", {
+            op: events_1.OpCodes.Power,
+            data: {
+                action: events_1.PowerAction.Stop
+            }
+        });
         return await new Promise((resolve) => {
             child.once("exit", resolve);
             child.kill();

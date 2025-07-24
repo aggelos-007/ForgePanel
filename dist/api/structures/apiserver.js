@@ -39,6 +39,10 @@ class APIServer {
             return c.json({ status: 500, message: "Internal Server Error" }, 500);
         });
         app.use(async (c, next) => {
+            if (c.req.path == "/" || c.req.path == "/register")
+                return next();
+            if (!authManager_1.AuthManager.isReady)
+                return c.json({ status: 403, message: "Server Is Not Ready" }, 403);
             const auth = c.req.header("Authorization");
             if (!auth)
                 return c.json({ status: 401, message: "Unauthorized" }, 401);

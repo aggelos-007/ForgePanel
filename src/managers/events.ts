@@ -5,19 +5,18 @@ import { ConfigSchema } from "../config";
 import { IApplicationCommandData, IBaseCommand } from "@tryforge/forgescript";
 
 export enum OpCodes {
-    Identify = 0,
-    Power = 1,
-    Console = 2,
-    Usage = 3,
-    GuildJoin = 4,
-    GuildLeave = 5,
-    ConfigUpdate = 6,
-    CreateCommand = 7,
-    EditCommand = 8,
-    DeleteCommand = 9,
-    DisableCommand = 10,
-    EnableCommand = 11,
-    MoveCommand = 12
+    Power = 0,
+    Console = 1,
+    Usage = 2,
+    GuildJoin = 3,
+    GuildLeave = 4,
+    ConfigUpdate = 5,
+    CreateCommand = 6,
+    EditCommand = 7,
+    DeleteCommand = 8,
+    DisableCommand = 9,
+    EnableCommand = 10,
+    MoveCommand = 11
 };
 
 export enum PowerAction {
@@ -26,7 +25,6 @@ export enum PowerAction {
 };
 
 type EventsData = {
-    [OpCodes.Identify]: null;
     [OpCodes.Power]: {
         action: PowerAction;
     };

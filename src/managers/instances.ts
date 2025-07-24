@@ -5,7 +5,7 @@ import { config } from "../config";
 import { randomUUID } from "crypto";
 import { createWriteStream } from "fs";
 import { ChildProcess, fork } from "child_process";
-import { emitter, OpCodes } from "./events";
+import { emitter, OpCodes, PowerAction } from "./events";
 import { ProcessCodes, ProcessMessage, ProcessMessages, SendType } from "./server-bridge";
 
 export class InstanceManager {
@@ -68,6 +68,12 @@ export class InstanceManager {
                 }
             });
         }, 1_000);
+        emitter.emit("websocket", {
+            op: OpCodes.Power,
+            data: {
+                action: PowerAction.Start
+            }
+        });
     }
 
     static async stop(){
@@ -76,6 +82,13 @@ export class InstanceManager {
         const child = this.child;
         this.child = false;
         this.#interval = null;
+
+        emitter.emit("websocket", {
+            op: OpCodes.Power,
+            data: {
+                action: PowerAction.Stop
+            }
+        });
 
         return await new Promise<void>((resolve) => {
             child.once("exit", resolve);

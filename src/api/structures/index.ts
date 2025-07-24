@@ -6,8 +6,8 @@ import { AuthManager } from "./authManager";
 export class WebServer {
     #api: APIServer;
 
-    constructor(){
-        new AuthManager();
+    constructor(dir: string){
+        new AuthManager(dir);
         this.#api = new APIServer("./routes");
         new WebSocket(
             new WebSocketServer({

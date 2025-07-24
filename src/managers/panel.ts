@@ -24,12 +24,12 @@ export class Panel {
     constructor(port: number){
         const dir = Panel.dir;
         if(!dir) throw new Error("Could not resolve main directory.");
-
-        Panel.webserver = new WebServer();
+        Panel.dir = this.dir = dirname(dir);
+        
+        Panel.webserver = new WebServer(join(this.dir, config.dir));
         Panel.reloadRoutes();
         Panel.webserver.listen(port);
 
-        Panel.dir = this.dir = dirname(dir);
         new InstanceManager(join(this.dir, config.bot));
         new CommandManager(dir)
 

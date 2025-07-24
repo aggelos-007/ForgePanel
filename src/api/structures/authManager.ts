@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import { createHmac, randomBytes } from "crypto";
+import { mkdirSync, existsSync } from "fs";
 
 export interface UserSchema {
     id: string;
@@ -19,8 +20,12 @@ export enum Permissions {
 
 export class AuthManager {
     static db: Database.Database;
-    constructor(){
-        const db = new Database("./.panel/auth.db");
+    static isReady = false;
+    static initToken: string;
+
+    constructor(dir: string){
+        if(!existsSync(dir)) mkdirSync(dir, { recursive: true });
+        const db = new Database(`${dir}/auth.db`);
 
         db.exec(`
             CREATE TABLE IF NOT EXISTS users (
@@ -31,7 +36,13 @@ export class AuthManager {
         `);
 
         AuthManager.db = db;
-        AuthManager.setUser({id: "637648484979441706", permissions: Permissions.ManageBot | Permissions.ManageGuilds | Permissions.ManageMembers | Permissions.ManageCommands | Permissions.ManagePower | Permissions.ManageTerminal | Permissions.ManageDataBase})
+        AuthManager.init()
+    }
+
+    static init(){
+        this.isReady = this.db.prepare("SELECT * FROM users").all().length > 0;;
+        if(this.isReady) return;
+        this.initToken = this.generateToken();
     }
 
     static generateToken(){

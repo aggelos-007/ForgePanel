@@ -1,6 +1,7 @@
 import { InstanceManager, Panel, ProcessCodes } from "../../../managers";
 import { ActivityType } from "discord.js";
 import { createRoute } from "../../structures/apiserver";
+import { Permissions } from "../../structures/authManager";
 
 interface IBody {
     status?: any | any[],
@@ -10,6 +11,10 @@ interface IBody {
 export const data = createRoute({
     url: "/client/status",
     method: ["get", "patch", "delete"],
+    auth: {
+        methods: ["patch", "delete"],
+        permissions: Permissions.ManageBot
+    },
     async handler(c, reply){
         switch(c.req.method.toLowerCase()){
             case "patch":

@@ -1,5 +1,6 @@
 import { CommandManager } from "../../../managers/commands";
 import { createRoute } from "../../structures/apiserver";
+import { Permissions } from "../../structures/authManager";
 
 interface IBody {
     path: string;
@@ -9,6 +10,10 @@ interface IBody {
 export const data = createRoute({
     url: "/commands/action/:id",
     method: ["patch", "delete", "put"],
+    auth: {
+        methods: ["patch", "delete", "put"],
+        permissions: Permissions.ManageCommands
+    },
     async handler(c, reply) {
         const id = Number(c.req.param("id"));
         const body = await c.req.json().catch(() => null) as IBody;

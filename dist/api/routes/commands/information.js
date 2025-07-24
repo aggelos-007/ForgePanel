@@ -5,9 +5,14 @@ const path_1 = require("path");
 const commands_1 = require("../../../managers/commands");
 const apiserver_1 = require("../../structures/apiserver");
 const config_1 = require("../../../config");
+const authManager_1 = require("../../structures/authManager");
 exports.data = (0, apiserver_1.createRoute)({
     url: "/commands/:id?",
     method: "get",
+    auth: {
+        methods: ["get"],
+        permissions: authManager_1.Permissions.ManageCommands
+    },
     async handler(c, reply) {
         const id = Number(c.req.param("id"));
         const type = c.req.query("type");

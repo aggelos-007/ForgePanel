@@ -1,6 +1,7 @@
 import { IApplicationCommandData, IBaseCommand } from "@tryforge/forgescript";
 import { createRoute } from "../../structures/apiserver";
 import { CommandManager } from "../../../managers/commands";
+import { Permissions } from "../../structures/authManager";
 
 interface ICommandsBody {
     type: "commands";
@@ -18,6 +19,10 @@ type IBody = ICommandsBody | ISlashesBody;
 export const data = createRoute({
     url: "/commands/create",
     method: "post",
+    auth: {
+        methods: ["post"],
+        permissions: Permissions.ManageCommands
+    },
     async handler(c, reply){
         const json = await c.req.json().catch(() => null) as IBody;
         if(!json) return reply.msg(400, "Invalid JSON");

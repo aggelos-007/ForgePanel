@@ -1,6 +1,7 @@
 import { GatewayIntentBits, GatewayIntentsString } from "discord.js";
 import { createRoute } from "../../structures/apiserver";
 import { InstanceManager, Panel } from "../../../managers";
+import { Permissions } from "../../structures/authManager";
 
 function areValidIntents(intents: string[]) {
     const validIntents = new Set<GatewayIntentsString>(Object.keys(GatewayIntentBits) as GatewayIntentsString[]);
@@ -10,6 +11,10 @@ function areValidIntents(intents: string[]) {
 export const data = createRoute({
     url: "/client/intents",
     method: ["get", "patch"],
+    auth: {
+        methods: ["patch"],
+        permissions: Permissions.ManageBot
+    },
     async handler(c, reply) {
         switch(c.req.method.toLowerCase()){
             case "patch":

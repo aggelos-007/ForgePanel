@@ -2,10 +2,15 @@ import { join } from "path";
 import { CommandManager } from "../../../managers/commands";
 import { createRoute } from "../../structures/apiserver";
 import { config } from "../../../config";
+import { Permissions } from "../../structures/authManager";
 
 export const data = createRoute({
     url: "/commands/:id?",
     method: "get",
+    auth: {
+        methods: ["get"],
+        permissions: Permissions.ManageCommands
+    },
     async handler(c, reply){
         const id = Number(c.req.param("id"));
         const type = c.req.query("type") as "commands" | "slashes" | undefined;

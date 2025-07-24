@@ -31,7 +31,10 @@ class WebSocket {
         ;
     }
     ;
-    #registerListener(ws) {
+    #registerListener(ws, req) {
+        const auth = req.headers.authorization;
+        if (!auth)
+            return ws.close(3000, JSON.stringify({ data: "Unauthorized" }));
         const id = (0, crypto_1.randomUUID)();
         this.#listeners.set(id, ws);
         ws.once("close", () => {

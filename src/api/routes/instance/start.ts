@@ -1,8 +1,13 @@
 import { InstanceManager } from "../../../managers";
 import { createRoute } from "../../structures/apiserver";
+import { Permissions } from "../../structures/authManager";
 
 export const data = createRoute({
     url: "/server/start",
+    auth: {
+        methods: ["post"],
+        permissions: Permissions.ManagePower
+    },
     method: "post",
     async handler(_, reply){
         const manager = InstanceManager;

@@ -1,6 +1,7 @@
 import { emitter, TypedEventData } from '../../managers';
 import { WebSocket as WS, WebSocketServer } from 'ws';
 import { randomUUID } from 'crypto';
+import { IncomingMessage } from 'http';
 
 export class WebSocket {
     #listeners = new Map<string, WS>();
@@ -24,7 +25,9 @@ export class WebSocket {
         };
     };
 
-    #registerListener(ws: WS){
+    #registerListener(ws: WS, req: IncomingMessage){
+        const auth = req.headers.authorization;
+        if(!auth) return ws.close(3000, JSON.stringify({data: "Unauthorized"}));
         const id = randomUUID();
         this.#listeners.set(id, ws);
 

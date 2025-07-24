@@ -5,8 +5,13 @@ const path_1 = require("path");
 const promises_1 = require("fs/promises");
 const config_1 = require("../../../config");
 const apiserver_1 = require("../../structures/apiserver");
+const authManager_1 = require("../../structures/authManager");
 exports.data = (0, apiserver_1.createRoute)({
     url: "/server/console",
+    auth: {
+        methods: ["get"],
+        permissions: authManager_1.Permissions.ManageTerminal
+    },
     method: "get",
     async handler(_, reply) {
         const file = await (0, promises_1.readFile)((0, path_1.join)(config_1.config.dir, "console.log"), { encoding: "utf-8" }).catch(() => { });

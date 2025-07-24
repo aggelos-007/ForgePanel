@@ -7,6 +7,7 @@ const stream_1 = require("stream");
 const hono_1 = require("hono");
 const fs_1 = require("fs");
 const http_1 = require("http");
+const authManager_1 = require("../structures/authManager");
 const isValidFile = (file) => file.endsWith('.js');
 ;
 function createRoute(input) { return input; }
@@ -37,6 +38,16 @@ class APIServer {
             console.log(err);
             return c.json({ status: 500, message: "Internal Server Error" }, 500);
         });
+        app.use(async (c, next) => {
+            const auth = c.req.header("Authorization");
+            if (!auth)
+                return c.json({ status: 401, message: "Unauthorized" }, 401);
+            const data = authManager_1.AuthManager.getUserByToken(auth);
+            if (!data)
+                return c.json({ status: 401, message: "Unauthorized" }, 401);
+            c.set("user", data);
+            return next();
+        });
         this.app = app;
         await this.#loader(this.dir);
     }
@@ -56,6 +67,10 @@ class APIServer {
                 if (!route)
                     continue;
                 this.app.on((Array.isArray(route.method) ? route.method : [route.method]).flatMap(s => s.toUpperCase()), route.url, (c) => {
+                    if (route.auth) {
+                        if (route.auth.methods.includes(c.req.method.toLowerCase()) && (route.auth.permissions & c.get("user").permissions) == 0)
+                            return c.json({ status: 403, message: "Access Forbidden" }, 403);
+                    }
                     return route.handler(c, {
                         succ: (data) => c.json({ status: 200, data }, 200),
                         msg: (status, message) => c.json({ status, message }, status)

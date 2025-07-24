@@ -4,20 +4,25 @@ import { Context, Hono } from 'hono';
 import { lstatSync, readdirSync, watch } from 'fs';
 import { createServer, IncomingMessage } from 'http';
 import { ContentfulStatusCode } from 'hono/utils/http-status';
+import { AuthManager, Permissions, UserSchema } from "../structures/authManager";
 
 const isValidFile = (file: string) => file.endsWith('.js');
 type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export interface RouteOptions<P extends string> {
     url: P;
+    auth?: {
+        methods: Lowercase<HTTPMethod>[],
+        permissions: Permissions
+    };
     method: Lowercase<HTTPMethod> | Lowercase<HTTPMethod>[];
-    handler: (c: Context<any, P>, r: {succ: (data?: any) => any; msg: (status: number, message?: any) => any}) => Promise<any>;
+    handler: (c: Context<{Variables: {user: UserSchema}}, P>, r: {succ: (data?: any) => any; msg: (status: number, message?: any) => any}) => Promise<any>;
 };
 
 export function createRoute<T extends string>(input: RouteOptions<T>): RouteOptions<T> { return input; };
 
 export class APIServer {
-    app = new Hono();
+    app = new Hono<{Variables: {user: UserSchema}}>();
     server: ReturnType<typeof createServer>;
     #dirs: string[] = [];
 
@@ -37,13 +42,23 @@ export class APIServer {
     }
 
     async load(){
-        const app = new Hono()
+        const app = new Hono<{Variables: {user: UserSchema}}>()
         app.notFound(c => c.json({status: 404, message: `${c.req.method.toUpperCase()} ${c.req.path} Not Found`}, 404))
 
         app.onError((err, c) => {
             console.log(err)
             return c.json({status: 500, message: "Internal Server Error"}, 500);
         })
+
+        app.use(async (c, next) => {
+            const auth = c.req.header("Authorization")
+            if(!auth) return c.json({status: 401, message: "Unauthorized"}, 401);
+            const data = AuthManager.getUserByToken(auth)
+            if(!data) return c.json({status: 401, message: "Unauthorized"}, 401);
+            c.set("user", data)
+            return next();
+        })
+
         this.app = app
         await this.#loader(this.dir);
     };
@@ -63,6 +78,9 @@ export class APIServer {
                 const route = require(path).data as RouteOptions<string>;
                 if (!route) continue;
                 this.app.on((Array.isArray(route.method) ? route.method : [route.method]).flatMap(s => s.toUpperCase()), route.url, (c) => {
+                    if(route.auth){
+                        if(route.auth.methods.includes(c.req.method.toLowerCase() as Lowercase<HTTPMethod>) && (route.auth.permissions & c.get("user").permissions) == 0) return c.json({status: 403, message: "Access Forbidden"}, 403);
+                    }
                     return route.handler(c, {
                         succ: (data?: any) => c.json({status: 200, data}, 200),
                         msg: (status: number, message?: string) => c.json({status, message}, status as ContentfulStatusCode)

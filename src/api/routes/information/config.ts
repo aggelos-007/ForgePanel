@@ -1,9 +1,14 @@
 import { ConfigSchema } from "../../../config";
 import { InstanceManager, Panel } from "../../../managers";
 import { createRoute } from "../../structures/apiserver";
+import { Permissions } from "../../structures/authManager";
 
 export const data = createRoute({
     url: "/config",
+    auth: {
+        methods: ["get", "patch"],
+        permissions: Permissions.ManageBot
+    },
     method: ["get", "patch"],
     async handler(c, reply){
         switch(c.req.method.toLowerCase()){

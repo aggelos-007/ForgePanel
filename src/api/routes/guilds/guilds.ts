@@ -1,8 +1,13 @@
 import { InstanceManager, ProcessCodes } from "../../../managers";
 import { createRoute } from "../../structures/apiserver";
+import { Permissions } from "../../structures/authManager";
 
 export const data = createRoute({
     url: "/client/guild/:id",
+    auth: {
+        methods: ["get", "delete"],
+        permissions: Permissions.ManageGuilds
+    },
     method: ["get", "delete"],
     async handler(c, reply){
         switch(c.req.method.toLowerCase()){

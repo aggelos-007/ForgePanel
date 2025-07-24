@@ -32,7 +32,8 @@ exports.ConfigDefaultSchema = {
         token: "OTM3Nzc0MTkzNDc3NTUwMDkx.GY9cRu.tED3361GsTtrOG-YMPOFC1PFsSnOW9k5BeS044",
     },
     panel: {
-        status: "stopped"
+        status: "stopped",
+        pkgManager: "npm"
     }
 };
 exports.botFile = `

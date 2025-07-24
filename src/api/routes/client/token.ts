@@ -1,9 +1,14 @@
 import { InstanceManager, Panel } from "../../../managers";
 import { createRoute } from "../../structures/apiserver";
+import { Permissions } from "../../structures/authManager";
 
 export const data = createRoute({
     url: "/client/token",
     method: "patch",
+    auth: {
+        methods: ["patch"],
+        permissions: Permissions.ManageBot
+    },
     async handler(c, reply){
         const json = await c.req.json().catch(()=>null)
         const token = json?.token

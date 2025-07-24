@@ -3,8 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = void 0;
 const apiserver_1 = require("../../structures/apiserver");
 const commands_1 = require("../../../managers/commands");
+const authManager_1 = require("../../structures/authManager");
 exports.data = (0, apiserver_1.createRoute)({
     url: "/commands/:id",
+    auth: {
+        methods: ["patch", "delete"],
+        permissions: authManager_1.Permissions.ManageCommands
+    },
     method: ["patch", "delete"],
     async handler(c, reply) {
         const id = Number(c.req.param("id"));

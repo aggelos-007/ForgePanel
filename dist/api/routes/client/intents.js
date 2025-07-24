@@ -4,6 +4,7 @@ exports.data = void 0;
 const discord_js_1 = require("discord.js");
 const apiserver_1 = require("../../structures/apiserver");
 const managers_1 = require("../../../managers");
+const authManager_1 = require("../../structures/authManager");
 function areValidIntents(intents) {
     const validIntents = new Set(Object.keys(discord_js_1.GatewayIntentBits));
     return intents.every((intent) => validIntents.has(intent));
@@ -11,6 +12,10 @@ function areValidIntents(intents) {
 exports.data = (0, apiserver_1.createRoute)({
     url: "/client/intents",
     method: ["get", "patch"],
+    auth: {
+        methods: ["patch"],
+        permissions: authManager_1.Permissions.ManageBot
+    },
     async handler(c, reply) {
         switch (c.req.method.toLowerCase()) {
             case "patch":

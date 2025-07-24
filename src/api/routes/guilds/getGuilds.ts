@@ -1,8 +1,13 @@
 import { InstanceManager, ProcessCodes } from "../../../managers";
 import { createRoute } from "../../structures/apiserver";
+import { Permissions } from "../../structures/authManager";
 
 export const data = createRoute({
     url: "/client/guilds",
+    auth: {
+        methods: ["get"],
+        permissions: Permissions.ManageGuilds
+    },
     method: "get",
     async handler(_, reply){
         const data = await InstanceManager.askChild({code: ProcessCodes.GetGuilds})

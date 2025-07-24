@@ -8,7 +8,7 @@ export class ExtensionsManager {
         const ext = [new ForgePanel(config)];
         if(config.extensions.includes("ForgeDB")) {
             const { ForgeDB } = require("@tryforge/forge.db")
-            ext.push(new ForgeDB())
+            ext.push(new ForgeDB({ type: "better-sqlite3" }))
         }
         if(config.extensions.includes("ForgeCanvas")) {
             const { ForgeCanvas } = require("@tryforge/forge.canvas")

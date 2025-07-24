@@ -1,6 +1,7 @@
 import { AttachmentBuilder, REST, Routes } from "discord.js";
 import { InstanceManager, Panel, ProcessCodes } from "../../../managers";
 import { createRoute } from "../../structures/apiserver";
+import { Permissions } from "../../structures/authManager";
 
 interface IBody {
     username?: string,
@@ -9,8 +10,12 @@ interface IBody {
 }
 
 export const data = createRoute({
-    url: "/client/appearence",
+    url: "/client/appearance",
     method: ["get", "patch"],
+    auth: {
+        methods: ["patch"],
+        permissions: Permissions.ManageBot
+    },
     async handler(c, reply){
         switch(c.req.method.toLowerCase()){
             case "patch":

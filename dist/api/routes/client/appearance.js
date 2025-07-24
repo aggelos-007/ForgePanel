@@ -4,9 +4,14 @@ exports.data = void 0;
 const discord_js_1 = require("discord.js");
 const managers_1 = require("../../../managers");
 const apiserver_1 = require("../../structures/apiserver");
+const authManager_1 = require("../../structures/authManager");
 exports.data = (0, apiserver_1.createRoute)({
-    url: "/client/appearence",
+    url: "/client/appearance",
     method: ["get", "patch"],
+    auth: {
+        methods: ["patch"],
+        permissions: authManager_1.Permissions.ManageBot
+    },
     async handler(c, reply) {
         switch (c.req.method.toLowerCase()) {
             case "patch":

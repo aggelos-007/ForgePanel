@@ -20,7 +20,7 @@ var Permissions;
 class AuthManager {
     static db;
     static isReady = false;
-    static initToken;
+    static initToken = null;
     constructor(dir) {
         if (!(0, fs_1.existsSync)(dir))
             (0, fs_1.mkdirSync)(dir, { recursive: true });
@@ -52,6 +52,11 @@ class AuthManager {
     }
     static setUser(data) {
         let token;
+        if (!this.isReady) {
+            this.isReady = true;
+            this.initToken = null;
+        }
+        ;
         const exists = this.db.prepare("SELECT * FROM users WHERE id = ?").get(data.id);
         if (exists) {
             token = exists.token;
@@ -72,6 +77,9 @@ class AuthManager {
     }
     static deleteToken(id) {
         return Boolean(this.db.prepare("DELETE FROM users WHERE id = ?").run(id).changes);
+    }
+    static getUsers() {
+        return this.db.prepare("SELECT * FROM users").all();
     }
 }
 exports.AuthManager = AuthManager;

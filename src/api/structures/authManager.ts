@@ -21,7 +21,7 @@ export enum Permissions {
 export class AuthManager {
     static db: Database.Database;
     static isReady = false;
-    static initToken: string;
+    static initToken: string | null = null;
 
     constructor(dir: string){
         if(!existsSync(dir)) mkdirSync(dir, { recursive: true });
@@ -58,6 +58,11 @@ export class AuthManager {
 
     static setUser(data: {id: string, permissions: number}){
         let token: string;
+        if(!this.isReady) {
+            this.isReady = true;
+            this.initToken = null;
+        };
+
         const exists = this.db.prepare("SELECT * FROM users WHERE id = ?").get(data.id) as UserSchema | undefined;
         if(exists){
             token = exists.token;
@@ -79,5 +84,9 @@ export class AuthManager {
 
     static deleteToken(id: string){
         return Boolean(this.db.prepare("DELETE FROM users WHERE id = ?").run(id).changes);
+    }
+
+    static getUsers(){
+        return this.db.prepare("SELECT * FROM users").all() as UserSchema[];
     }
 }

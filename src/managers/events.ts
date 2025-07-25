@@ -16,7 +16,10 @@ export enum OpCodes {
     DeleteCommand = 8,
     DisableCommand = 9,
     EnableCommand = 10,
-    MoveCommand = 11
+    MoveCommand = 11,
+    MemberCreate = 12,
+    MemberUpdate = 13,
+    MemberDelete = 14
 };
 
 export enum PowerAction {
@@ -73,6 +76,23 @@ type EventsData = {
         type: "commands" | "slashes";
         oldPath: string;
         newPath: string;
+    };
+    [OpCodes.MemberCreate]: {
+        id: string;
+        permissions: number;
+    };
+    [OpCodes.MemberUpdate]: {
+        old: {
+            id: string;
+            permissions: number;
+        };
+        new: {
+            id: string;
+            permissions: number;
+        };
+    };
+    [OpCodes.MemberDelete]: {
+        id: string;
     };
 };
 

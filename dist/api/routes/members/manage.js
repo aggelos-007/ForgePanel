@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = void 0;
+const managers_1 = require("../../../managers");
 const apiserver_1 = require("../../structures/apiserver");
 const authManager_1 = require("../../structures/authManager");
 const AllPerms = Object.values(authManager_1.Permissions).filter((v) => typeof v === "number").reduce((a, b) => a + b, 0);
@@ -37,16 +38,41 @@ exports.data = (0, apiserver_1.createRoute)({
             case "post":
                 if (f)
                     return reply.msg(400, "Member already exists");
-                return reply.succ({ token: authManager_1.AuthManager.setUser({ id, permissions: json.permissions }) });
+                const token = authManager_1.AuthManager.setUser({ id, permissions: json.permissions });
+                managers_1.emitter.emit("websocket", {
+                    op: managers_1.OpCodes.MemberCreate,
+                    data: {
+                        id,
+                        permissions: json.permissions
+                    }
+                });
+                return reply.succ({ token });
             case "patch":
                 if (!f)
                     return reply.msg(404, "Member not found");
                 authManager_1.AuthManager.setUser({ id, permissions: json.permissions });
+                managers_1.emitter.emit("websocket", {
+                    op: managers_1.OpCodes.MemberUpdate,
+                    data: {
+                        old: {
+                            id,
+                            permissions: f.permissions
+                        },
+                        new: {
+                            id,
+                            permissions: json.permissions
+                        }
+                    }
+                });
                 return reply.succ();
             case "delete":
                 if (!f)
                     return reply.msg(404, "Member not found");
                 authManager_1.AuthManager.deleteToken(id);
+                managers_1.emitter.emit("websocket", {
+                    op: managers_1.OpCodes.MemberDelete,
+                    data: { id }
+                });
                 return reply.succ();
         }
     }

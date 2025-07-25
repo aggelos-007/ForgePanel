@@ -1,3 +1,4 @@
+import { emitter, OpCodes } from "../../../managers";
 import { createRoute } from "../../structures/apiserver";
 import { AuthManager, Permissions } from "../../structures/authManager";
 
@@ -33,14 +34,39 @@ export const data = createRoute({
                 return reply.succ(member);
             case "post":
                 if(f) return reply.msg(400, "Member already exists");
-                return reply.succ({ token: AuthManager.setUser({id, permissions: json!.permissions}) });
+                const token = AuthManager.setUser({id, permissions: json!.permissions});
+                emitter.emit("websocket", {
+                    op: OpCodes.MemberCreate,
+                    data: {
+                        id,
+                        permissions: json!.permissions
+                    }
+                });
+                return reply.succ({ token });
             case "patch":
                 if(!f) return reply.msg(404, "Member not found");
                 AuthManager.setUser({id, permissions: json!.permissions});
+                emitter.emit("websocket", {
+                    op: OpCodes.MemberUpdate,
+                    data: {
+                        old: {
+                            id,
+                            permissions: f.permissions
+                        },
+                        new: {
+                            id,
+                            permissions: json!.permissions
+                        }
+                    }
+                });
                 return reply.succ();
             case "delete":
                 if(!f) return reply.msg(404, "Member not found");
                 AuthManager.deleteToken(id);
+                emitter.emit("websocket", {
+                    op: OpCodes.MemberDelete,
+                    data: { id }
+                });
                 return reply.succ();
         }
     }

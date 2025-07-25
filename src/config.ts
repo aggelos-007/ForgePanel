@@ -62,7 +62,7 @@ export const ConfigDefaultSchema: ConfigSchema = {
         extensions: [],
         status: [],
         statusInterval: 30_000,
-        token: "OTM3Nzc0MTkzNDc3NTUwMDkx.GY9cRu.tED3361GsTtrOG-YMPOFC1PFsSnOW9k5BeS044",
+        token: "",
     },
     panel: {
         status: "stopped",
